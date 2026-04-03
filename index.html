@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AyacuchoTravel — Descubre la Ciudad Heroica</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #C9963A;
+      --gold-light: #E8BE6A;
+      --rust: #8B3A2A;
+      --deep: #1A0F0A;
+      --cream: #F5EDD8;
+      --text-muted: #9C8B75;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--deep);
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    /* ─── TEXTURE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ─── TYPOGRAPHY ─── */
+    .font-display { font-family: 'Playfair Display', serif; }
+    .font-condensed { font-family: 'Barlow Condensed', sans-serif; }
+
+    /* ─── NAVBAR ─── */
+    #navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      transition: all 0.4s ease;
+      padding: 1.5rem 0;
+    }
+    #navbar.scrolled {
+      background: rgba(26,15,10,0.95);
+      backdrop-filter: blur(12px);
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(201,150,58,0.2);
+    }
+    .nav-link {
+      position: relative;
+      color: rgba(245,237,216,0.8);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+      text-decoration: none;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--gold);
+      transition: width 0.3s;
+    }
+    .nav-link:hover { color: var(--gold-light); }
+    .nav-link:hover::after { width: 100%; }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh;
+      background: linear-gradient(160deg, #3D1F0E 0%, #1A0F0A 50%, #0E0A14 100%);
+      position: relative;
+      display: flex; align-items: center;
+      overflow: hidden;
+    }
+    .hero-pattern {
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(ellipse 80% 60% at 70% 50%, rgba(201,150,58,0.08) 0%, transparent 70%),
+        repeating-linear-gradient(45deg, transparent, transparent 60px, rgba(201,150,58,0.02) 60px, rgba(201,150,58,0.02) 61px),
+        repeating-linear-gradient(-45deg, transparent, transparent 60px, rgba(201,150,58,0.02) 60px, rgba(201,150,58,0.02) 61px);
+    }
+    .hero-img-overlay {
+      position: absolute; inset: 0;
+      background: url('https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=1600&q=80') center/cover no-repeat;
+      opacity: 0.18;
+      mix-blend-mode: luminosity;
+    }
+    .hero-title {
+      font-size: clamp(3.5rem, 8vw, 7.5rem);
+      line-height: 0.9;
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+    }
+    .hero-subtitle {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-size: 0.85rem;
+    }
+    .gold-line {
+      width: 80px; height: 2px;
+      background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: linear-gradient(135deg, var(--gold), var(--rust));
+      color: var(--cream);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 1rem 2.2rem;
+      border: none; cursor: pointer;
+      text-decoration: none;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+      transition: all 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .btn-primary:hover::before { opacity: 1; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(201,150,58,0.35); }
+
+    .btn-outline {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      border: 1px solid rgba(201,150,58,0.5);
+      color: var(--gold-light);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 1rem 2.2rem;
+      text-decoration: none;
+      transition: all 0.3s;
+      background: transparent;
+      cursor: pointer;
+    }
+    .btn-outline:hover {
+      background: rgba(201,150,58,0.1);
+      border-color: var(--gold);
+    }
+
+    /* ─── FLOATING STATS ─── */
+    .stat-card {
+      background: rgba(245,237,216,0.05);
+      border: 1px solid rgba(201,150,58,0.2);
+      backdrop-filter: blur(8px);
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .stat-number {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 900;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    /* ─── SECTION ─── */
+    .section-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-size: 0.75rem;
+    }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.1;
+    }
+
+    /* ─── TOUR CARD ─── */
+    .tour-card {
+      background: rgba(245,237,216,0.04);
+      border: 1px solid rgba(201,150,58,0.15);
+      overflow: hidden;
+      transition: all 0.4s ease;
+      cursor: pointer;
+      position: relative;
+    }
+    .tour-card:hover {
+      border-color: rgba(201,150,58,0.5);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(201,150,58,0.2);
+    }
+    .tour-card-img {
+      height: 220px; overflow: hidden; position: relative;
+    }
+    .tour-card-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.6s ease;
+      filter: saturate(0.8);
+    }
+    .tour-card:hover .tour-card-img img { transform: scale(1.08); filter: saturate(1); }
+    .tour-badge {
+      position: absolute; top: 1rem; left: 1rem;
+      background: var(--gold);
+      color: var(--deep);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.7rem;
+    }
+    .tour-duration {
+      position: absolute; top: 1rem; right: 1rem;
+      background: rgba(26,15,10,0.85);
+      color: var(--cream);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.25rem 0.7rem;
+      backdrop-filter: blur(4px);
+    }
+    .price-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--gold);
+    }
+    .whatsapp-btn {
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      background: #25D366;
+      color: white;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.8rem;
+      text-decoration: none;
+      transition: all 0.3s;
+      border: none; cursor: pointer; width: 100%;
+    }
+    .whatsapp-btn:hover { background: #1da851; }
+
+    /* ─── PAQUETES ─── */
+    .package-card {
+      background: linear-gradient(135deg, rgba(201,150,58,0.08) 0%, rgba(139,58,42,0.06) 100%);
+      border: 1px solid rgba(201,150,58,0.2);
+      position: relative; overflow: hidden;
+      transition: all 0.4s;
+    }
+    .package-card.featured {
+      background: linear-gradient(135deg, rgba(201,150,58,0.18) 0%, rgba(139,58,42,0.15) 100%);
+      border-color: rgba(201,150,58,0.5);
+    }
+    .package-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 50px rgba(0,0,0,0.4);
+    }
+    .package-card.featured::before {
+      content: 'MÁS POPULAR';
+      position: absolute; top: 1.2rem; right: -2rem;
+      background: var(--gold);
+      color: var(--deep);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      padding: 0.3rem 3rem;
+      transform: rotate(45deg);
+    }
+    .check-item {
+      display: flex; align-items: center; gap: 0.6rem;
+      font-size: 0.9rem; color: rgba(245,237,216,0.8);
+    }
+    .check-icon { color: var(--gold); font-size: 0.8rem; flex-shrink: 0; }
+
+    /* ─── VUELOS ─── */
+    .flight-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: rgba(245,237,216,0.04);
+      border: 1px solid rgba(201,150,58,0.12);
+      transition: all 0.3s;
+    }
+    .flight-row:hover {
+      background: rgba(201,150,58,0.08);
+      border-color: rgba(201,150,58,0.3);
+    }
+    .airline-logo {
+      width: 40px; height: 40px;
+      background: rgba(201,150,58,0.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      color: var(--gold);
+    }
+
+    /* ─── DESTINOS / NOSOTROS ─── */
+    .about-img {
+      position: relative;
+    }
+    .about-img::before {
+      content: '';
+      position: absolute;
+      top: -15px; left: -15px;
+      right: 15px; bottom: 15px;
+      border: 1px solid rgba(201,150,58,0.3);
+      z-index: 0;
+    }
+    .about-img img {
+      position: relative; z-index: 1;
+      width: 100%; height: 420px; object-fit: cover;
+      filter: saturate(0.75);
+    }
+    .feature-item {
+      display: flex; gap: 1rem; align-items: flex-start;
+      padding: 1.2rem;
+      border-left: 2px solid rgba(201,150,58,0.2);
+      transition: border-color 0.3s;
+    }
+    .feature-item:hover { border-color: var(--gold); }
+    .feature-icon {
+      width: 44px; height: 44px;
+      background: rgba(201,150,58,0.1);
+      border: 1px solid rgba(201,150,58,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; flex-shrink: 0;
+    }
+
+    /* ─── TESTIMONIOS ─── */
+    .testimonial-card {
+      background: rgba(245,237,216,0.04);
+      border: 1px solid rgba(201,150,58,0.12);
+      padding: 2rem;
+      position: relative;
+    }
+    .testimonial-card::before {
+      content: '"';
+      position: absolute;
+      top: -1rem; left: 1.5rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      color: var(--gold);
+      opacity: 0.3;
+      line-height: 1;
+    }
+    .stars { color: var(--gold); letter-spacing: 0.1em; font-size: 0.85rem; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #0E0A08;
+      border-top: 1px solid rgba(201,150,58,0.15);
+    }
+    .footer-link {
+      color: rgba(245,237,216,0.5);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: color 0.3s;
+      display: block; margin-bottom: 0.5rem;
+    }
+    .footer-link:hover { color: var(--gold-light); }
+
+    /* ─── WA FLOATING ─── */
+    .wa-float {
+      position: fixed;
+      bottom: 2rem; right: 2rem;
+      z-index: 200;
+      width: 60px; height: 60px;
+      background: #25D366;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 25px rgba(37,211,102,0.4);
+      animation: pulse-wa 2s infinite;
+      text-decoration: none;
+      transition: transform 0.3s;
+    }
+    .wa-float:hover { transform: scale(1.1); }
+    @keyframes pulse-wa {
+      0%,100% { box-shadow: 0 8px 25px rgba(37,211,102,0.4); }
+      50% { box-shadow: 0 8px 40px rgba(37,211,102,0.7); }
+    }
+
+    /* ─── DIVIDER ─── */
+    .gold-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    /* ─── ANIMATIONS ─── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ─── MOBILE MENU ─── */
+    #mobile-menu {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(26,15,10,0.98);
+      z-index: 99;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+    #mobile-menu.open { display: flex; }
+    #mobile-menu a {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--cream);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    #mobile-menu a:hover { color: var(--gold); }
+
+    /* ─── SEARCH BAR ─── */
+    .search-bar {
+      background: rgba(245,237,216,0.06);
+      border: 1px solid rgba(201,150,58,0.25);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 1rem;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      .search-bar { grid-template-columns: 1fr; }
+    }
+    .search-input {
+      background: rgba(245,237,216,0.08);
+      border: 1px solid rgba(201,150,58,0.2);
+      color: var(--cream);
+      padding: 0.8rem 1rem;
+      font-family: 'Barlow', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.3s;
+      width: 100%;
+    }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus { border-color: var(--gold); }
+
+    /* ─── SCROLL INDICATOR ─── */
+    .scroll-indicator {
+      position: absolute; bottom: 2.5rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 640px) {
+      .hero-title { font-size: 3rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     NAVBAR
+══════════════════════════════ -->
+<nav id="navbar" class="relative z-50">
+  <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="#hero" class="flex items-center gap-3">
+      <div class="w-9 h-9 border border-yellow-600 flex items-center justify-center">
+        <span style="color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.75rem;letter-spacing:0.05em;">AT</span>
+      </div>
+      <div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;letter-spacing:0.15em;font-size:1rem;color:var(--cream);">AYACUCHO</div>
+        <div style="font-family:'Barlow',sans-serif;font-size:0.6rem;letter-spacing:0.25em;color:var(--gold);text-transform:uppercase;">Travel & Tours</div>
+      </div>
+    </a>
+    <!-- Links desktop -->
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#nosotros" class="nav-link">Nosotros</a>
+      <a href="#tours" class="nav-link">Tours</a>
+      <a href="#paquetes" class="nav-link">Paquetes</a>
+      <a href="#vuelos" class="nav-link">Vuelos</a>
+      <a href="#testimonios" class="nav-link">Reseñas</a>
+      <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20información%20sobre%20tours%20en%20Ayacucho" target="_blank" class="btn-primary text-sm py-2 px-5">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Reservar
+      </a>
+    </div>
+    <!-- Hamburger -->
+    <button id="hamburger" class="md:hidden text-cream p-2" onclick="toggleMenu()">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div id="mobile-menu">
+  <button onclick="toggleMenu()" style="position:absolute;top:1.5rem;right:1.5rem;color:var(--cream);background:none;border:none;font-size:1.5rem;cursor:pointer;">✕</button>
+  <a href="#nosotros" onclick="toggleMenu()">Nosotros</a>
+  <a href="#tours" onclick="toggleMenu()">Tours</a>
+  <a href="#paquetes" onclick="toggleMenu()">Paquetes</a>
+  <a href="#vuelos" onclick="toggleMenu()">Vuelos</a>
+  <a href="#testimonios" onclick="toggleMenu()">Reseñas</a>
+</div>
+
+<!-- ══════════════════════════════
+     HERO
+══════════════════════════════ -->
+<section id="hero" class="relative">
+  <div class="hero-pattern"></div>
+  <div class="hero-img-overlay"></div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-6 py-32 md:py-40">
+    <div class="max-w-2xl">
+      <div class="hero-subtitle mb-6 flex items-center gap-3">
+        <div class="gold-line"></div>
+        Ciudad Heroica del Perú
+      </div>
+      <h1 class="hero-title mb-6" style="color:var(--cream);">
+        Descubre<br/>
+        <span style="color:var(--gold);font-style:italic;">Ayacucho</span><br/>
+        <span style="font-size:0.55em;font-weight:400;color:rgba(245,237,216,0.7);">como nunca antes</span>
+      </h1>
+      <p class="text-lg mb-10" style="color:rgba(245,237,216,0.65);font-weight:300;max-width:480px;line-height:1.8;">
+        Iglesias coloniales, artesanía milenaria, gastronomía única y paisajes que robarán tu corazón. Tu aventura comienza aquí.
+      </p>
+      <div class="flex flex-wrap gap-4">
+        <a href="#tours" class="btn-primary">
+          Ver Tours
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#paquetes" class="btn-outline">Ver Paquetes</a>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20">
+      <div class="stat-card fade-up">
+        <div class="stat-number">33+</div>
+        <div class="text-xs mt-1" style="color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;">Iglesias coloniales</div>
+      </div>
+      <div class="stat-card fade-up" style="transition-delay:0.1s">
+        <div class="stat-number">500+</div>
+        <div class="text-xs mt-1" style="color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;">Clientes felices</div>
+      </div>
+      <div class="stat-card fade-up" style="transition-delay:0.2s">
+        <div class="stat-number">15+</div>
+        <div class="text-xs mt-1" style="color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;">Tours disponibles</div>
+      </div>
+      <div class="stat-card fade-up" style="transition-delay:0.3s">
+        <div class="stat-number">8+</div>
+        <div class="text-xs mt-1" style="color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;">Años de experiencia</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search bar -->
+  <div class="relative z-10 max-w-7xl mx-auto px-6 pb-20">
+    <div class="search-bar">
+      <div>
+        <div class="text-xs mb-2" style="color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;">Destino</div>
+        <select class="search-input" style="cursor:pointer;">
+          <option value="" style="background:#1A0F0A;">Selecciona destino</option>
+          <option style="background:#1A0F0A;">Pampa de Ayacucho</option>
+          <option style="background:#1A0F0A;">Wari (Huari)</option>
+          <option style="background:#1A0F0A;">Quinua</option>
+          <option style="background:#1A0F0A;">Vilcashuamán</option>
+          <option style="background:#1A0F0A;">Huanta</option>
+        </select>
+      </div>
+      <div>
+        <div class="text-xs mb-2" style="color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;">Tipo</div>
+        <select class="search-input" style="cursor:pointer;">
+          <option value="" style="background:#1A0F0A;">Tipo de tour</option>
+          <option style="background:#1A0F0A;">Cultural</option>
+          <option style="background:#1A0F0A;">Arqueológico</option>
+          <option style="background:#1A0F0A;">Gastronómico</option>
+          <option style="background:#1A0F0A;">Aventura</option>
+          <option style="background:#1A0F0A;">Religioso</option>
+        </select>
+      </div>
+      <div>
+        <div class="text-xs mb-2" style="color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;">Personas</div>
+        <select class="search-input" style="cursor:pointer;">
+          <option style="background:#1A0F0A;">1 persona</option>
+          <option style="background:#1A0F0A;">2 personas</option>
+          <option style="background:#1A0F0A;">3–5 personas</option>
+          <option style="background:#1A0F0A;">Grupo (+6)</option>
+        </select>
+      </div>
+      <button class="btn-primary whitespace-nowrap" onclick="buscarTour()">
+        Buscar Tour
+      </button>
+    </div>
+  </div>
+
+  <div class="scroll-indicator">
+    <div class="text-xs" style="color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase;font-size:0.6rem;">Scroll</div>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     NOSOTROS
+══════════════════════════════ -->
+<section id="nosotros" class="py-24 relative">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid md:grid-cols-2 gap-16 items-center">
+      <div class="about-img fade-up">
+        <img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=80" alt="Ayacucho colonial" />
+        <div style="position:absolute;bottom:-1.5rem;right:-1.5rem;z-index:2;background:var(--gold);padding:1.5rem;text-align:center;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:2.5rem;font-weight:900;color:var(--deep);line-height:1;">8+</div>
+          <div style="font-size:0.7rem;color:var(--deep);letter-spacing:0.1em;text-transform:uppercase;">Años de<br/>experiencia</div>
+        </div>
+      </div>
+      <div class="fade-up" style="transition-delay:0.15s">
+        <div class="section-tag mb-4">Sobre nosotros</div>
+        <h2 class="section-title mb-6">La agencia local<br/>que conoce cada<br/><em>rincón de Ayacucho</em></h2>
+        <div class="gold-line mb-6"></div>
+        <p class="mb-8" style="color:rgba(245,237,216,0.65);line-height:1.9;font-weight:300;">
+          Somos una agencia 100% ayacuchana con pasión por mostrar lo mejor de nuestra tierra. Nuestros guías son locales certificados que conocen la historia, cultura y secretos de cada destino.
+        </p>
+        <div class="space-y-3">
+          <div class="feature-item">
+            <div class="feature-icon">🏛️</div>
+            <div>
+              <div class="font-semibold mb-1" style="font-size:0.95rem;">Guías locales certificados</div>
+              <div style="font-size:0.85rem;color:var(--text-muted);">Conocedores de historia, cultura y tradiciones ayacuchanas</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🚌</div>
+            <div>
+              <div class="font-semibold mb-1" style="font-size:0.95rem;">Transporte seguro y cómodo</div>
+              <div style="font-size:0.85rem;color:var(--text-muted);">Unidades modernas con aire acondicionado</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📱</div>
+            <div>
+              <div class="font-semibold mb-1" style="font-size:0.95rem;">Reserva por WhatsApp</div>
+              <div style="font-size:0.85rem;color:var(--text-muted);">Confirmación inmediata y atención personalizada</div>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">💰</div>
+            <div>
+              <div class="font-semibold mb-1" style="font-size:0.95rem;">Mejor precio garantizado</div>
+              <div style="font-size:0.85rem;color:var(--text-muted);">Sin costos ocultos, todo incluido en tu paquete</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider mx-6 md:mx-20"></div>
+
+<!-- ══════════════════════════════
+     TOURS
+══════════════════════════════ -->
+<section id="tours" class="py-24">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 fade-up">
+      <div class="section-tag mb-4">Nuestros tours</div>
+      <h2 class="section-title">Experiencias únicas<br/><em>que no olvidarás</em></h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- Tour 1 -->
+      <div class="tour-card fade-up">
+        <div class="tour-card-img">
+          <img src="https://images.unsplash.com/photo-1548013146-72479768bada?w=600&q=80" alt="Wari" />
+          <span class="tour-badge">Arqueológico</span>
+          <span class="tour-duration">1 día</span>
+        </div>
+        <div class="p-6">
+          <h3 class="font-display text-xl mb-2">Complejo Arqueológico Wari</h3>
+          <p class="text-sm mb-4" style="color:var(--text-muted);line-height:1.7;">
+            Visita la antigua capital del Imperio Wari, la primera civilización urbana de los Andes. Guía especializado incluido.
+          </p>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs" style="color:var(--text-muted);">📍 22 km de Ayacucho</span>
+            <span class="text-xs" style="color:var(--text-muted);">👥 Máx. 15 personas</span>
+          </div>
+          <div class="flex items-center justify-between mt-4 pt-4" style="border-top:1px solid rgba(201,150,58,0.15);">
+            <div>
+              <div class="text-xs mb-1" style="color:var(--text-muted);">Desde</div>
+              <div class="price-tag">S/. 65</div>
+              <div class="text-xs" style="color:var(--text-muted);">por persona</div>
+            </div>
+            <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20reservar%20el%20Tour%20Complejo%20Arqueológico%20Wari%20por%20S/.65%20por%20persona.%20¿Hay%20disponibilidad?" target="_blank" class="whatsapp-btn" style="width:auto;padding:0.7rem 1.2rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Reservar
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tour 2 -->
+      <div class="tour-card fade-up" style="transition-delay:0.1s">
+        <div class="tour-card-img">
+          <img src="https://images.unsplash.com/photo-1531761535209-83234f4d1cd7?w=600&q=80" alt="Centro histórico" />
+          <span class="tour-badge">Cultural</span>
+          <span class="tour-duration">Medio día</span>
+        </div>
+        <div class="p-6">
+          <h3 class="font-display text-xl mb-2">City Tour Colonial</h3>
+          <p class="text-sm mb-4" style="color:var(--text-muted);line-height:1.7;">
+            Recorre las 33 iglesias coloniales, la Plaza Mayor, el mercado artesanal y los mejores miradores de la ciudad.
+          </p>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs" style="color:var(--text-muted);">📍 Centro histórico</span>
+            <span class="text-xs" style="color:var(--text-muted);">⏱️ 4 horas</span>
+          </div>
+          <div class="flex items-center justify-between mt-4 pt-4" style="border-top:1px solid rgba(201,150,58,0.15);">
+            <div>
+              <div class="text-xs mb-1" style="color:var(--text-muted);">Desde</div>
+              <div class="price-tag">S/. 45</div>
+              <div class="text-xs" style="color:var(--text-muted);">por persona</div>
+            </div>
+            <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20reservar%20el%20City%20Tour%20Colonial%20por%20S/.45%20por%20persona.%20¿Hay%20disponibilidad?" target="_blank" class="whatsapp-btn" style="width:auto;padding:0.7rem 1.2rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Reservar
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tour 3 -->
+      <div class="tour-card fade-up" style="transition-delay:0.2s">
+        <div class="tour-card-img">
+          <img src="https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=600&q=80" alt="Quinua" />
+          <span class="tour-badge">Histórico</span>
+          <span class="tour-duration">1 día</span>
+        </div>
+        <div class="p-6">
+          <h3 class="font-display text-xl mb-2">Pampa de Ayacucho & Quinua</h3>
+          <p class="text-sm mb-4" style="color:var(--text-muted);line-height:1.7;">
+            Visita el campo histórico de la Batalla de Ayacucho, el obelisco y el hermoso pueblo artesanal de Quinua.
+          </p>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs" style="color:var(--text-muted);">📍 37 km al norte</span>
+            <span class="text-xs" style="color:var(--text-muted);">👥 Máx. 20 personas</span>
+          </div>
+          <div class="flex items-center justify-between mt-4 pt-4" style="border-top:1px solid rgba(201,150,58,0.15);">
+            <div>
+              <div class="text-xs mb-1" style="color:var(--text-muted);">Desde</div>
+              <div class="price-tag">S/. 70</div>
+              <div class="text-xs" style="color:var(--text-muted);">por persona</div>
+            </div>
+            <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20reservar%20el%20Tour%20Pampa%20de%20Ayacucho%20y%20Quinua%20por%20S/.70%20por%20persona.%20¿Hay%20disponibilidad?" target="_blank" class="whatsapp-btn" style="width:auto;padding:0.7rem 1.2rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Reservar
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tour 4 -->
+      <div class="tour-card fade-up" style="transition-delay:0.0s">
+        <div class="tour-card-img">
+          <img src="https://images.unsplash.com/photo-1576495199011-eb94736d05d6?w=600&q=80" alt="Vilcashuaman" />
+          <span class="tour-badge">Arqueológico</span>
+          <span class="tour-duration">2 días</span>
+        </div>
+        <div class="p-6">
+          <h3 class="font-display text-xl mb-2">Vilcashuamán Inca</h3>
+          <p class="text-sm mb-4" style="color:var(--text-muted);line-height:1.7;">
+            Explora el importante centro administrativo inca con su ushnu piramidal, templo del sol y laguna de Pomacocha.
+          </p>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs" style="color:var(--text-muted);">📍 120 km de Ayacucho</span>
+            <span class="text-xs" style="color:var(--text-muted);">🏨 1 noche incluida</span>
+          </div>
+          <div class="flex items-center justify-between mt-4 pt-4" style="border-top:1px solid rgba(201,150,58,0.15);">
+            <div>
+              <div class="text-xs mb-1" style="color:var(--text-muted);">Desde</div>
+              <div class="price-tag">S/. 180</div>
+              <div class="text-xs" style="color:var(--text-muted);">por persona</div>
+            </div>
+            <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20reservar%20el%20Tour%20Vilcashuamán%20Inca%202%20días%20por%20S/.180%20por%20persona.%20¿Hay%20disponibilidad?" target="_blank" class="whatsapp-btn" style="width:auto;padding:0.7rem 1.2rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Reservar
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tour 5 -->
+      <div class="tour-card fade-up" style="transition-delay:0.1s">
+        <div class="tour-card-img">
+          <img src="https://images.unsplash.com/photo-1512958789922-48c7e2b84c92?w=600&q=80" alt="Gastronomia" />
+          <span class="tour-badge">Gastronómico</span>
+          <span class="tour-duration">Medio día</span>
+        </div>
+        <div class="p-6">
+          <h3 class="font-display text-xl mb-2">Ruta Gastronómica</h3>
+          <p class="text-sm mb-4" style="color:var(--text-muted);line-height:1.7;">
+            Descubre el puca picante, cuy con papas, la chicha de jora y los dulces típicos en los mejores restaurantes locales.
+          </p>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs" style="color:var(--text-muted);">📍 Centro de Ayacucho</span>
+            <span class="text-xs" style="color:var(--text-muted);">🍽️ Degustaciones incl.</span>
+          </div>
+          <div class="flex items-center justify-between mt-4 pt-4" style="border-top:1px solid rgba(201,150,58,0.15);">
+            <div>
+              <div class="text-xs mb-1" style="color:var(--text-muted);">Desde</div>
+              <div class="price-tag">S/. 85</div>
+              <div class="text-xs" style="color:var(--text-muted);">por persona</div>
+            </div>
+            <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20reservar%20la%20Ruta%20Gastronómica%20por%20S/.85%20por%20persona.%20¿Hay%20disponibilidad?" target="_blank" class="whatsapp-btn" style="width:auto;padding:0.7rem 1.2rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Reservar
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tour 6 -->
+      <div class="tour-card fade-up" style="transition-delay:0.2s">
+        <div class="tour-card-img">
+          <img src="https://images.unsplash.com/photo-1551632811-561732d1e306?w=600&q=80" alt="Aventura" />
+          <span class="tour-badge">Aventura</span>
+          <span class="tour-duration">1 día</span>
+        </div>
+        <div class="p-6">
+          <h3 class="font-display text-xl mb-2">Trekking & Aventura</h3>
+          <p class="text-sm mb-4" style="color:var(--text-muted);line-height:1.7;">
+            Caminatas por los cerros de Ayacucho con vistas espectaculares, visita a comunidades campesinas y experiencias andinas.
+          </p>
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs" style="color:var(--text-muted);">📍 Alrededores</span>
+            <span class="text-xs" style="color:var(--text-muted);">🎒 Equipo incluido</span>
+          </div>
+          <div class="flex items-center justify-between mt-4 pt-4" style="border-top:1px solid rgba(201,150,58,0.15);">
+            <div>
+              <div class="text-xs mb-1" style="color:var(--text-muted);">Desde</div>
+              <div class="price-tag">S/. 90</div>
+              <div class="text-xs" style="color:var(--text-muted);">por persona</div>
+            </div>
+            <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20reservar%20el%20Tour%20Trekking%20y%20Aventura%20por%20S/.90%20por%20persona.%20¿Hay%20disponibilidad?" target="_blank" class="whatsapp-btn" style="width:auto;padding:0.7rem 1.2rem;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Reservar
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider mx-6 md:mx-20"></div>
+
+<!-- ══════════════════════════════
+     PAQUETES
+══════════════════════════════ -->
+<section id="paquetes" class="py-24">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 fade-up">
+      <div class="section-tag mb-4">Paquetes turísticos</div>
+      <h2 class="section-title">Todo incluido para<br/><em>vivir Ayacucho al máximo</em></h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- Básico -->
+      <div class="package-card p-8 fade-up">
+        <div class="text-xs mb-4" style="color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;">Paquete</div>
+        <h3 class="font-display text-3xl mb-1">Básico</h3>
+        <div class="gold-line my-4"></div>
+        <div class="flex items-baseline gap-2 mb-6">
+          <span class="price-tag" style="font-size:2.5rem;">S/. 350</span>
+          <span style="color:var(--text-muted);font-size:0.85rem;">/ persona</span>
+        </div>
+        <div class="space-y-3 mb-8">
+          <div class="check-item"><span class="check-icon">✦</span>2 noches de hospedaje</div>
+          <div class="check-item"><span class="check-icon">✦</span>City Tour Colonial</div>
+          <div class="check-item"><span class="check-icon">✦</span>Desayuno incluido</div>
+          <div class="check-item"><span class="check-icon">✦</span>Traslado aeropuerto</div>
+          <div class="check-item" style="opacity:0.4;"><span class="check-icon">✦</span>Tours extra</div>
+          <div class="check-item" style="opacity:0.4;"><span class="check-icon">✦</span>Guía privado</div>
+        </div>
+        <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20el%20Paquete%20Básico%20de%20Ayacucho%20por%20S/.350%20por%20persona.%20¿Pueden%20darme%20más%20detalles?" target="_blank" class="whatsapp-btn" style="display:flex;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Cotizar por WhatsApp
+        </a>
+      </div>
+
+      <!-- Premium (featured) -->
+      <div class="package-card featured p-8 fade-up" style="transition-delay:0.1s;">
+        <div class="text-xs mb-4" style="color:var(--gold);letter-spacing:0.2em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;">Paquete</div>
+        <h3 class="font-display text-3xl mb-1">Premium</h3>
+        <div class="gold-line my-4"></div>
+        <div class="flex items-baseline gap-2 mb-6">
+          <span class="price-tag" style="font-size:2.5rem;">S/. 650</span>
+          <span style="color:var(--text-muted);font-size:0.85rem;">/ persona</span>
+        </div>
+        <div class="space-y-3 mb-8">
+          <div class="check-item"><span class="check-icon">✦</span>3 noches de hospedaje</div>
+          <div class="check-item"><span class="check-icon">✦</span>City Tour + Wari + Quinua</div>
+          <div class="check-item"><span class="check-icon">✦</span>Desayuno y cena incluidos</div>
+          <div class="check-item"><span class="check-icon">✦</span>Traslado aeropuerto</div>
+          <div class="check-item"><span class="check-icon">✦</span>Ruta gastronómica</div>
+          <div class="check-item" style="opacity:0.4;"><span class="check-icon">✦</span>Guía privado</div>
+        </div>
+        <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20el%20Paquete%20Premium%20de%20Ayacucho%20por%20S/.650%20por%20persona.%20¿Pueden%20darme%20más%20detalles?" target="_blank" class="whatsapp-btn" style="display:flex;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Cotizar por WhatsApp
+        </a>
+      </div>
+
+      <!-- VIP -->
+      <div class="package-card p-8 fade-up" style="transition-delay:0.2s;">
+        <div class="text-xs mb-4" style="color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase;font-family:'Barlow Condensed',sans-serif;font-weight:700;">Paquete</div>
+        <h3 class="font-display text-3xl mb-1">VIP</h3>
+        <div class="gold-line my-4"></div>
+        <div class="flex items-baseline gap-2 mb-6">
+          <span class="price-tag" style="font-size:2.5rem;">S/. 1,100</span>
+          <span style="color:var(--text-muted);font-size:0.85rem;">/ persona</span>
+        </div>
+        <div class="space-y-3 mb-8">
+          <div class="check-item"><span class="check-icon">✦</span>5 noches hospedaje 4★</div>
+          <div class="check-item"><span class="check-icon">✦</span>Todos los tours incluidos</div>
+          <div class="check-item"><span class="check-icon">✦</span>Alimentación completa</div>
+          <div class="check-item"><span class="check-icon">✦</span>Traslados privados</div>
+          <div class="check-item"><span class="check-icon">✦</span>Guía privado bilingüe</div>
+          <div class="check-item"><span class="check-icon">✦</span>Seguro de viaje incluido</div>
+        </div>
+        <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20el%20Paquete%20VIP%20de%20Ayacucho%20por%20S/.1100%20por%20persona.%20¿Pueden%20darme%20más%20detalles?" target="_blank" class="whatsapp-btn" style="display:flex;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Cotizar por WhatsApp
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Paquete personalizado CTA -->
+    <div class="mt-10 p-8 text-center fade-up" style="border:1px dashed rgba(201,150,58,0.3);">
+      <div class="section-tag mb-3">¿No encuentras lo que buscas?</div>
+      <h3 class="font-display text-2xl mb-4">Creamos tu paquete <em>a medida</em></h3>
+      <p class="mb-6" style="color:var(--text-muted);max-width:500px;margin-left:auto;margin-right:auto;">
+        Dinos tus fechas, presupuesto y preferencias. Diseñamos la experiencia perfecta para ti o tu grupo.
+      </p>
+      <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20un%20paquete%20personalizado%20para%20Ayacucho.%20¿Pueden%20ayudarme?" target="_blank" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Diseñar mi paquete
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider mx-6 md:mx-20"></div>
+
+<!-- ══════════════════════════════
+     VUELOS
+══════════════════════════════ -->
+<section id="vuelos" class="py-24">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 fade-up">
+      <div class="section-tag mb-4">Vuelos disponibles</div>
+      <h2 class="section-title">Llega a Ayacucho<br/><em>desde cualquier ciudad</em></h2>
+      <p class="mt-4" style="color:var(--text-muted);max-width:500px;margin:1rem auto 0;">
+        Te ayudamos a encontrar y reservar los mejores vuelos hacia el Aeropuerto Coronel FAP Alfredo Mendívil Duarte.
+      </p>
+    </div>
+
+    <div class="space-y-3 mb-10">
+
+      <!-- Lima → Ayacucho -->
+      <div class="flight-row fade-up">
+        <div class="flex items-center gap-4">
+          <div class="airline-logo">LATAM</div>
+          <div>
+            <div class="font-condensed font-bold text-lg" style="color:var(--cream);">Lima (LIM)</div>
+            <div class="text-xs" style="color:var(--text-muted);">Jorge Chávez</div>
+          </div>
+        </div>
+        <div class="text-center">
+          <div class="text-xs mb-1" style="color:var(--text-muted);">~55 min</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="width:40px;height:1px;background:rgba(201,150,58,0.4);"></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--gold)" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+            <div style="width:40px;height:1px;background:rgba(201,150,58,0.4);"></div>
+          </div>
+          <div class="text-xs mt-1" style="color:var(--text-muted);">Directo</div>
+        </div>
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <div class="font-condensed font-bold text-lg" style="color:var(--cream);">Ayacucho (AYP)</div>
+            <div class="text-xs" style="color:var(--text-muted);">Crl. FAP A. Mendívil</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs" style="color:var(--text-muted);">Desde</div>
+            <div class="font-condensed font-bold text-xl" style="color:var(--gold);">S/. 280</div>
+            <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20información%20sobre%20vuelos%20Lima-Ayacucho.%20¿Pueden%20ayudarme%20a%20reservar?" target="_blank" class="text-xs" style="color:#25D366;text-decoration:none;">Consultar →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cusco → Ayacucho -->
+      <div class="flight-row fade-up" style="transition-delay:0.1s">
+        <div class="flex items-center gap-4">
+          <div class="airline-logo">SKY</div>
+          <div>
+            <div class="font-condensed font-bold text-lg" style="color:var(--cream);">Cusco (CUZ)</div>
+            <div class="text-xs" style="color:var(--text-muted);">Velasco Astete</div>
+          </div>
+        </div>
+        <div class="text-center">
+          <div class="text-xs mb-1" style="color:var(--text-muted);">~1h 10min</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="width:40px;height:1px;background:rgba(201,150,58,0.4);"></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--gold)" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+            <div style="width:40px;height:1px;background:rgba(201,150,58,0.4);"></div>
+          </div>
+          <div class="text-xs mt-1" style="color:var(--text-muted);">Con escala</div>
+        </div>
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <div class="font-condensed font-bold text-lg" style="color:var(--cream);">Ayacucho (AYP)</div>
+            <div class="text-xs" style="color:var(--text-muted);">Crl. FAP A. Mendívil</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs" style="color:var(--text-muted);">Desde</div>
+            <div class="font-condensed font-bold text-xl" style="color:var(--gold);">S/. 380</div>
+            <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20información%20sobre%20vuelos%20Cusco-Ayacucho.%20¿Pueden%20ayudarme%20a%20reservar?" target="_blank" class="text-xs" style="color:#25D366;text-decoration:none;">Consultar →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arequipa → Ayacucho -->
+      <div class="flight-row fade-up" style="transition-delay:0.2s">
+        <div class="flex items-center gap-4">
+          <div class="airline-logo">VIVA</div>
+          <div>
+            <div class="font-condensed font-bold text-lg" style="color:var(--cream);">Arequipa (AQP)</div>
+            <div class="text-xs" style="color:var(--text-muted);">Alfredo Rodríguez B.</div>
+          </div>
+        </div>
+        <div class="text-center">
+          <div class="text-xs mb-1" style="color:var(--text-muted);">~1h 30min</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="width:40px;height:1px;background:rgba(201,150,58,0.4);"></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--gold)" style="flex-shrink:0"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>
+            <div style="width:40px;height:1px;background:rgba(201,150,58,0.4);"></div>
+          </div>
+          <div class="text-xs mt-1" style="color:var(--text-muted);">Con escala</div>
+        </div>
+        <div class="flex items-center justify-between gap-4">
+          <div>
+            <div class="font-condensed font-bold text-lg" style="color:var(--cream);">Ayacucho (AYP)</div>
+            <div class="text-xs" style="color:var(--text-muted);">Crl. FAP A. Mendívil</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs" style="color:var(--text-muted);">Desde</div>
+            <div class="font-condensed font-bold text-xl" style="color:var(--gold);">S/. 420</div>
+            <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20información%20sobre%20vuelos%20Arequipa-Ayacucho.%20¿Pueden%20ayudarme%20a%20reservar?" target="_blank" class="text-xs" style="color:#25D366;text-decoration:none;">Consultar →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="p-6 text-center fade-up" style="background:rgba(37,211,102,0.06);border:1px solid rgba(37,211,102,0.2);">
+      <p style="color:rgba(245,237,216,0.7);font-size:0.9rem;">
+        ✈️ &nbsp;¿Buscas un vuelo desde otra ciudad? Escríbenos y encontramos la mejor opción para ti.
+      </p>
+      <a href="https://wa.me/51999999999?text=Hola!%20Necesito%20ayuda%20para%20buscar%20vuelos%20hacia%20Ayacucho.%20Salgo%20desde:" target="_blank" class="btn-primary mt-4 inline-flex">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Consultar vuelos
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="gold-divider mx-6 md:mx-20"></div>
+
+<!-- ══════════════════════════════
+     TESTIMONIOS
+══════════════════════════════ -->
+<section id="testimonios" class="py-24">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="text-center mb-16 fade-up">
+      <div class="section-tag mb-4">Testimonios</div>
+      <h2 class="section-title">Lo que dicen nuestros<br/><em>viajeros</em></h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="testimonial-card fade-up">
+        <div class="stars mb-4">★★★★★</div>
+        <p class="mb-6" style="color:rgba(245,237,216,0.7);font-size:0.95rem;line-height:1.8;font-style:italic;">
+          "Increíble experiencia. El guía conocía cada detalle de la historia de Wari. Definitivamente lo recomiendo a cualquiera que quiera conocer Ayacucho de verdad."
+        </p>
+        <div class="flex items-center gap-3">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(201,150,58,0.2);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold);font-size:0.9rem;">MC</div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;">María C.</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Lima, Perú</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-up" style="transition-delay:0.1s">
+        <div class="stars mb-4">★★★★★</div>
+        <p class="mb-6" style="color:rgba(245,237,216,0.7);font-size:0.95rem;line-height:1.8;font-style:italic;">
+          "El paquete Premium valió cada sol. El hospedaje fue excelente y el tour gastronómico fue lo mejor del viaje. ¡Volveré el próximo año!"
+        </p>
+        <div class="flex items-center gap-3">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(201,150,58,0.2);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold);font-size:0.9rem;">RP</div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;">Roberto P.</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Arequipa, Perú</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-up" style="transition-delay:0.2s">
+        <div class="stars mb-4">★★★★★</div>
+        <p class="mb-6" style="color:rgba(245,237,216,0.7);font-size:0.95rem;line-height:1.8;font-style:italic;">
+          "Reservar por WhatsApp fue super fácil y rápido. Me atendieron en minutos y todo estuvo perfectamente organizado. Una agencia de confianza."
+        </p>
+        <div class="flex items-center gap-3">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(201,150,58,0.2);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold);font-size:0.9rem;">SL</div>
+          <div>
+            <div style="font-weight:600;font-size:0.9rem;">Sofía L.</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Bogotá, Colombia</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     CTA BANNER
+══════════════════════════════ -->
+<section class="py-20" style="background:linear-gradient(135deg, rgba(201,150,58,0.12) 0%, rgba(139,58,42,0.10) 100%);border-top:1px solid rgba(201,150,58,0.2);border-bottom:1px solid rgba(201,150,58,0.2);">
+  <div class="max-w-4xl mx-auto px-6 text-center fade-up">
+    <div class="section-tag mb-4">¿Listo para viajar?</div>
+    <h2 class="section-title mb-6">Tu aventura en Ayacucho<br/><em>comienza con un mensaje</em></h2>
+    <p class="mb-10" style="color:rgba(245,237,216,0.6);max-width:500px;margin:0 auto 2.5rem;line-height:1.9;">
+      Escríbenos ahora por WhatsApp. Te respondemos en minutos con la mejor propuesta para tu viaje.
+    </p>
+    <a href="https://wa.me/51999999999?text=Hola!%20Quiero%20planear%20un%20viaje%20a%20Ayacucho.%20¿Pueden%20ayudarme?" target="_blank" class="btn-primary text-base py-4 px-10">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Escribir por WhatsApp ahora
+    </a>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     FOOTER
+══════════════════════════════ -->
+<footer class="py-16">
+  <div class="max-w-7xl mx-auto px-6">
+    <div class="grid md:grid-cols-4 gap-12 mb-12">
+      <!-- Brand -->
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-9 h-9 border border-yellow-700 flex items-center justify-center">
+            <span style="color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:0.75rem;letter-spacing:0.05em;">AT</span>
+          </div>
+          <div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:900;letter-spacing:0.15em;font-size:1rem;color:var(--cream);">AYACUCHO</div>
+            <div style="font-family:'Barlow',sans-serif;font-size:0.6rem;letter-spacing:0.25em;color:var(--gold);text-transform:uppercase;">Travel & Tours</div>
+          </div>
+        </div>
+        <p style="color:var(--text-muted);font-size:0.85rem;line-height:1.8;max-width:320px;">
+          La agencia local especializada en mostrar la magia de Ayacucho al mundo. Autenticidad, seguridad y experiencias que perduran.
+        </p>
+        <div class="flex gap-4 mt-6">
+          <a href="https://wa.me/51999999999" target="_blank" style="width:38px;height:38px;border:1px solid rgba(201,150,58,0.3);display:flex;align-items:center;justify-content:center;color:var(--gold);transition:all 0.3s;text-decoration:none;" onmouseover="this.style.background='rgba(201,150,58,0.1)'" onmouseout="this.style.background='transparent'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          </a>
+          <a href="#" style="width:38px;height:38px;border:1px solid rgba(201,150,58,0.3);display:flex;align-items:center;justify-content:center;color:var(--gold);transition:all 0.3s;text-decoration:none;" onmouseover="this.style.background='rgba(201,150,58,0.1)'" onmouseout="this.style.background='transparent'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="#" style="width:38px;height:38px;border:1px solid rgba(201,150,58,0.3);display:flex;align-items:center;justify-content:center;color:var(--gold);transition:all 0.3s;text-decoration:none;" onmouseover="this.style.background='rgba(201,150,58,0.1)'" onmouseout="this.style.background='transparent'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div>
+        <h4 class="font-condensed font-bold text-sm mb-5" style="letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);">Servicios</h4>
+        <a href="#tours" class="footer-link">Tours de 1 día</a>
+        <a href="#tours" class="footer-link">Tours de varios días</a>
+        <a href="#paquetes" class="footer-link">Paquetes turísticos</a>
+        <a href="#vuelos" class="footer-link">Vuelos a Ayacucho</a>
+        <a href="https://wa.me/51999999999" target="_blank" class="footer-link">Tours grupales</a>
+        <a href="https://wa.me/51999999999" target="_blank" class="footer-link">Tours corporativos</a>
+      </div>
+
+      <!-- Contacto -->
+      <div>
+        <h4 class="font-condensed font-bold text-sm mb-5" style="letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);">Contacto</h4>
+        <div class="space-y-3">
+          <a href="https://wa.me/51999999999" target="_blank" class="footer-link flex items-center gap-2">
+            <span>📱</span> +51 999 999 999
+          </a>
+          <a href="mailto:info@ayacuchotravel.pe" class="footer-link flex items-center gap-2">
+            <span>✉️</span> info@ayacuchotravel.pe
+          </a>
+          <div class="footer-link flex items-center gap-2" style="cursor:default;">
+            <span>📍</span> Jr. Lima 123, Ayacucho
+          </div>
+          <div class="footer-link flex items-center gap-2" style="cursor:default;">
+            <span>🕐</span> Lun–Sáb: 8am – 7pm
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="gold-divider mb-8"></div>
+    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+      <p style="color:var(--text-muted);font-size:0.8rem;">© 2025 AyacuchoTravel. Todos los derechos reservados.</p>
+      <p style="color:var(--text-muted);font-size:0.8rem;">Hecho con ❤️ en Ayacucho, Perú</p>
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp floating button -->
+<a href="https://wa.me/51999999999?text=Hola!%20Visité%20su%20página%20y%20quiero%20más%20información%20sobre%20tours%20en%20Ayacucho." target="_blank" class="wa-float" title="Chatear por WhatsApp">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Mobile menu
+  function toggleMenu() {
+    document.getElementById('mobile-menu').classList.toggle('open');
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Search bar
+  function buscarTour() {
+    const destino = document.querySelector('.search-bar select:nth-child(1)').value;
+    const tipo = document.querySelector('.search-bar select:nth-child(2)').value;
+    const personas = document.querySelector('.search-bar select:nth-child(3)').value;
+    let msg = 'Hola! Quiero información sobre tours en Ayacucho.';
+    if (destino) msg += ` Destino: ${destino}.`;
+    if (tipo) msg += ` Tipo: ${tipo}.`;
+    if (personas) msg += ` Somos ${personas}.`;
+    window.open(`https://wa.me/51999999999?text=${encodeURIComponent(msg)}`, '_blank');
+  }
+</script>
+
+</body>
+</html>
